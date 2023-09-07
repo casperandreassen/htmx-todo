@@ -1,0 +1,28 @@
+{{if .completedTodos}}
+  <p class="text-gray-900 dark:text-white">Fullførte gjøremål</p>
+  <div class="flex flex-row gap-4 flex-wrap">
+    {{ range .completedTodos }}
+      {{ template "todo" . }}
+    {{end}}
+  </div>
+{{end}}
+  {{ if .expiredTodos }}
+  <p class="text-gray-900 dark:text-white">Forfalte gjøremål</p>
+  <div class="flex flex-row gap-4 flex-wrap">
+    {{ range .expiredTodos }}
+    {{ template "todo" . }}
+    {{end}}
+  </div>
+  {{end}}
+  {{ if .otherTodos }}
+  <p class="text-gray-900 dark:text-white">Andre gjøremål</p>
+  <div class="flex flex-row gap-4 flex-wrap">
+    {{ range .otherTodos }}
+      {{ template "todo" . }}
+    {{end}}
+    </div>
+  {{end}}
+
+
+
+

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.5" integrity="sha384-xcuj3WpfgjlKF+FXhSQFQ0ZNr39ln+hwjN3npfM9VBnUskLolQAcN80McRIVOPuO" crossorigin="anonymous"></script>
+    <title>Todo list</title>
+</head>
+<body class="max-w-4xl mx-auto dark:bg-slate-900 m-10 flex flex-col gap-10">
+    <div class="w-96 bg-white dark:bg-gray-800 p-5 border-gray-200 rounded-lg shadow m-auto">
+        <h1 class="text-gray-900 dark:text-white">Nytt gjøremål</h1>
+        <form hx-on::after-request="this.reset()" hx-post="/todo" hx-target="#todos-list" hx-swap="innerHTML">
+            <div class="mb-6">
+                <label for="title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tittel</label>
+                <input type="text" id="title" name="title" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
+            </div>
+            <div class="mb-6">
+                <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Beskrivelse</label>
+                <input type="text" name="description" id="description" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
+            </div>
+            <div class="mb-6">
+                <label for="date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Forfall</label>
+                <input type="date" name="date" id="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+            </div>
+            <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Opprett</button>
+        </form>
+    </div>
+
+    <div id="todos-list" hx-get="/todo" hx-swap="innerHTML" hx-trigger="load" class="flex flex-col gap-4 ">
+    </div>
+</body>
+</html>
