@@ -29,7 +29,7 @@ func Authenticate(c *gin.Context) {
 	} else {
 		token, err := utils.IssueJwtToken(retrievedUser)
 		if err == nil {
-			c.SetCookie("token", token, 6000000, "/", "localhost", false, true)
+			c.SetCookie("token", token, 6000000, "/", "htmx-todo.fly.dev", true, true)
 			c.Header("HX-Redirect", "/")
 
 		} else {

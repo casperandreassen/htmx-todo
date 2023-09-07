@@ -29,7 +29,7 @@ func RegisterUser(c *gin.Context) {
 
 	var stringHash = string(hash)
 
-	db.DB.MustExec("INSERT INTO user (username, password) VALUES ($1, $2)", credentials.Username, stringHash)
+	db.DB.MustExec("INSERT INTO user (username, password) VALUES ($1, $2)", "casper", stringHash)
 
 	c.HTML(201, "account_created.html", gin.H{})
 

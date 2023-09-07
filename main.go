@@ -38,8 +38,7 @@ func main() {
 		private.DELETE("/todo", handlers.HandleDeleteTodo)
 		private.PATCH("/todo", handlers.HandleUpdateTodoState)
 	}
-	router.Run(":8080")
-
+	router.Run("0.0.0.0:8080")
 }
 
 func HandleIndex(c *gin.Context) {
@@ -48,9 +47,9 @@ func HandleIndex(c *gin.Context) {
 }
 
 func HandleSignUpPage(c *gin.Context) {
-	c.HTML(http.StatusOK, "signup.html", gin.H{})
+	c.HTML(http.StatusOK, "index.html", gin.H{"templateName": "signup"})
 }
 
 func HandleLoginPage(c *gin.Context) {
-	c.HTML(http.StatusOK, "login.html", gin.H{})
+	c.HTML(http.StatusOK, "index.html", gin.H{"templateName": "login"})
 }

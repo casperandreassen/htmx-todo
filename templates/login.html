@@ -1,4 +1,4 @@
-
+{{ define "login" }}
 <div class="max-w-lg m-auto">
   <h1 class="text-lg font-medium text-gray-900 dark:text-white">Logg inn</h1>
   <form id="login-form" hx-target="#login-form" class=" m-auto" hx-post="/authenticate" hx-swap="outerHTML">
@@ -14,4 +14,4 @@
     <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Logg inn</button>
   </form>
 </div>
-
+{{ end }}

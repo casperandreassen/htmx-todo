@@ -6,11 +6,21 @@
     <script src="https://unpkg.com/htmx.org@1.9.5" integrity="sha384-xcuj3WpfgjlKF+FXhSQFQ0ZNr39ln+hwjN3npfM9VBnUskLolQAcN80McRIVOPuO" crossorigin="anonymous"></script>
     <title>TodoApp</title>
 </head>
-<body id="" class="w-screen mx-auto dark:bg-slate-900 m-10 flex flex-col justify-between gap-10 h-screen">
+<body id="" class="w-screen mx-auto dark:bg-slate-900 m-10 flex flex-col justify-between gap-10 max-h-screen h-full">
     {{ template "navbar" . }}
-    <main {{ if .signedIn }} hx-get="/todos" {{else}} hx-get="/login" {{end}} hx-trigger="load" hx-swap="innerHTML">
+    {{ if .templateName }}
+        <main class="max-w-5xl mx-auto dark:bg-slate-900 m-10">
+            {{ if eq .templateName "login" }}
+                {{ template "login" }}
+            {{ else }}
+                {{ template "signup" }}
+            {{ end }}
+        </main>
+    {{ else }}
+    <main class="max-w-5xl mx-auto dark:bg-slate-900 m-10" {{ if .signedIn }} hx-get="/todos" {{else}} hx-get="/login" {{end}} hx-trigger="load" hx-swap="innerHTML">
 
     </main>
+    {{end}}
     {{ template "footer" . }}
 </body>
 </html>

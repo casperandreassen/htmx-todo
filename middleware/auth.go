@@ -9,19 +9,19 @@ import (
 func Auth(c *gin.Context) {
 	cookie, err := c.Cookie("token")
 	if err != nil {
-		c.Abort()
+		c.AbortWithStatus(401)
 		return
 	}
 
 	parsedToken, tokenErr := utils.VerifyJwtToken(cookie)
 
 	if tokenErr != nil {
-		c.Abort()
+		c.AbortWithStatus(401)
 		return
 	}
 
 	if !parsedToken.Valid {
-		c.Abort()
+		c.AbortWithStatus(401)
 		return
 	}
 
@@ -34,7 +34,7 @@ func Auth(c *gin.Context) {
 		c.Set("username", level)
 		c.Next()
 	} else {
-		c.Abort()
+		c.AbortWithStatus(401)
 	}
 }
 
