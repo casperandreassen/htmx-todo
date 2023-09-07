@@ -19,3 +19,8 @@
 
 # Go workspace file
 go.work
+
+# Database
+*.db
+
+.DS_Store
