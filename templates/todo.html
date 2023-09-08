@@ -7,10 +7,10 @@
         <p class="text-xs">Tittel</p>
         <p class="text-lg">{{.Title}}</p>
       </div>
-      {{ if .Date.Valid}}
+      {{ if .Date.Valid }}
       <div>
         <p class="text-xs">Forfall</p>
-        <p class="text-sm">{{ .Date.Time.Format "02.01.2006" }}</p>
+        <p class="text-sm">{{ .Date.String }}</p>
       </div>
       {{end}}
     </div>

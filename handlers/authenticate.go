@@ -1,9 +1,13 @@
 package handlers
 
 import (
-	"github.com/gin-gonic/gin"
+	"database/sql"
+	"errors"
 	"go-server/db"
 	"go-server/utils"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -18,23 +22,45 @@ func Authenticate(c *gin.Context) {
 	if err := c.ShouldBind(&credentials); err != nil {
 		return
 	}
-	retrievedUser := db.User{}
+	user, err := getUser(credentials.Username)
 
-	db.DB.Get(&retrievedUser, "SELECT * FROM user WHERE username = $1", credentials.Username)
-
-	err := bcrypt.CompareHashAndPassword([]byte(retrievedUser.Password), []byte(credentials.Password))
 	if err != nil {
-		c.HTML(401, "invalid_credentials.html", gin.H{"errorMessage": "Invalid credentials"})
+		c.HTML(http.StatusOK, "login", gin.H{"errorMessage": "No such user."})
+		return
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(credentials.Password))
+	if err != nil {
+		c.HTML(http.StatusOK, "login", gin.H{"errorMessage": "Invalid credentials."})
 		return
 	} else {
-		token, err := utils.IssueJwtToken(retrievedUser)
+		token, err := utils.IssueJwtToken(user)
 		if err == nil {
-			c.SetCookie("token", token, 6000000, "/", "htmx-todo.fly.dev", true, true)
+			c.SetSameSite(http.SameSiteLaxMode)
+			c.SetCookie("token", token, 6000000, "/", "htmx-todo-23.fly.dev", true, true)
 			c.Header("HX-Redirect", "/")
-
 		} else {
-			c.Status(500)
+			c.HTML(http.StatusOK, "login", gin.H{"errorMessage": "Something went wrong."})
 		}
 		return
 	}
+}
+
+func SignOut(c *gin.Context) {
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("token", "", 6000000, "/", "htmx-todo-23.fly.dev", true, true)
+	c.Header("HX-Redirect", "/login")
+}
+
+func getUser(username string) (db.User, error) {
+	var user db.User
+
+	row := db.DB.QueryRow("SELECT * FROM user WHERE username = ?", username)
+	if err := row.Scan(&user.Id, &user.Username, &user.Password); err != nil {
+		if err == sql.ErrNoRows {
+			return user, errors.New("No such row")
+		}
+		return user, errors.New("Error getting todo")
+	}
+	return user, nil
 }

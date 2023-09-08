@@ -2,16 +2,13 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/jmoiron/sqlx"
-	_ "github.com/mattn/go-sqlite3"
 	"go-server/db"
 	"go-server/handlers"
 	"go-server/middleware"
 	"go-server/utils"
 	"net/http"
+	"os"
 )
-
-var DB *sqlx.DB
 
 func main() {
 	utils.GenerateKeyPairs()
@@ -24,6 +21,7 @@ func main() {
 	router.GET("/signup", HandleSignUpPage)
 	router.POST("/authenticate", handlers.Authenticate)
 	router.POST("/signup", handlers.RegisterUser)
+	router.GET("/signout", handlers.SignOut)
 	router.GET("/", HandleIndex)
 
 	//load html file
@@ -38,7 +36,13 @@ func main() {
 		private.DELETE("/todo", handlers.HandleDeleteTodo)
 		private.PATCH("/todo", handlers.HandleUpdateTodoState)
 	}
-	router.Run("0.0.0.0:8080")
+
+	httpPort := os.Getenv("PORT")
+	if httpPort == "" {
+		httpPort = "8080"
+	}
+
+	router.Run("0.0.0.0:" + httpPort)
 }
 
 func HandleIndex(c *gin.Context) {

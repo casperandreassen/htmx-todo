@@ -1,10 +1,12 @@
 package handlers
 
 import (
-	"github.com/gin-gonic/gin"
+	"errors"
 	"go-server/db"
-	"golang.org/x/crypto/bcrypt"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type RegisterUserInput struct {
@@ -21,6 +23,11 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
+	if credentials.Password != credentials.RePassword {
+		c.HTML(201, "signup", gin.H{"errorMessage": "Passwords does not match"})
+		return
+	}
+
 	hash, err := bcrypt.GenerateFromPassword([]byte(credentials.Password), 10)
 
 	if err != nil {
@@ -29,8 +36,23 @@ func RegisterUser(c *gin.Context) {
 
 	var stringHash = string(hash)
 
-	db.DB.MustExec("INSERT INTO user (username, password) VALUES ($1, $2)", "casper", stringHash)
+	_, err = insertUser(credentials, stringHash)
 
+	if err != nil {
+		c.HTML(201, "signup", gin.H{"errorMessage": "Username already taken"})
+		return
+	}
 	c.HTML(201, "account_created.html", gin.H{})
+}
 
+func insertUser(credentials RegisterUserInput, passwordHash string) (int64, error) {
+	result, err := db.DB.Exec("INSERT INTO user (username, password) VALUES (?, ?)", credentials.Username, passwordHash)
+	if err != nil {
+		return 0, errors.New("Could not insert user")
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, errors.New("Could not get id of inserted row")
+	}
+	return id, nil
 }

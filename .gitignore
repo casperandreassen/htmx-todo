@@ -23,4 +23,11 @@ go.work
 # Database
 *.db
 
+
 .DS_Store
+.idea
+.vscode
+
+# Secret files
+*.env
+fly.toml
