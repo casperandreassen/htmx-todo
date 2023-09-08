@@ -1,1 +1,4 @@
 TURSO_DB_URL=http://127.0.0.1:8080
+PORT=8070
+APP_URL=localhost
+JWT_SECRET=super_secret_key
