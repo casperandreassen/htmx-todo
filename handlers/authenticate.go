@@ -30,15 +30,18 @@ func Authenticate(c *gin.Context) {
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(credentials.Password))
+
 	if err != nil {
 		c.HTML(http.StatusOK, "login", gin.H{"errorMessage": "Invalid credentials."})
 		return
 	} else {
 		token, err := utils.IssueJwtToken(user.Id, user.Username)
 		if err == nil {
+			appUrl := os.Getenv("APP_URL")
 			c.SetSameSite(http.SameSiteLaxMode)
-			c.SetCookie("token", token, 6000000, "/", "htmx-todo-23.fly.dev", true, true)
+			c.SetCookie("token", token, 6000000, "/", appUrl, true, true)
 			c.Header("HX-Redirect", "/")
+			return
 		} else {
 			c.HTML(http.StatusOK, "login", gin.H{"errorMessage": "Something went wrong."})
 		}

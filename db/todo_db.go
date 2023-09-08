@@ -67,7 +67,7 @@ func GetSingleTodo(todoId int) (DBTodo, error) {
 }
 
 func GetTodos(c *gin.Context) ([]DBTodo, error) {
-	userid := c.MustGet("id").(float64)
+	userid := c.MustGet("id").(int)
 	todos := []DBTodo{}
 	query, err := DB.Prepare("SELECT * FROM todos WHERE userid = ?")
 
@@ -75,7 +75,7 @@ func GetTodos(c *gin.Context) ([]DBTodo, error) {
 		log.Fatal(err)
 	}
 	defer query.Close()
-	rows, err := query.Query(int(userid))
+	rows, err := query.Query(userid)
 	if err != nil {
 		log.Fatal(err)
 	}

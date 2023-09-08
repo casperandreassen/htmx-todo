@@ -2,14 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/htmx.org@1.9.5" integrity="sha384-xcuj3WpfgjlKF+FXhSQFQ0ZNr39ln+hwjN3npfM9VBnUskLolQAcN80McRIVOPuO" crossorigin="anonymous"></script>
     <title>TodoApp</title>
 </head>
-<body id="" class="w-screen mx-auto dark:bg-slate-900 m-10 flex flex-col justify-between gap-10 max-h-screen h-full">
+<body id="" class="dark:bg-slate-900 ">
     {{ template "navbar" . }}
     {{ if .templateName }}
-        <main class="max-w-5xl mx-auto dark:bg-slate-900 m-10">
+        <main class="mt-20 m-auto ml-5 mr-5">
             {{ if eq .templateName "login" }}
                 {{ template "login" }}
             {{ else }}
@@ -17,7 +18,7 @@
             {{ end }}
         </main>
     {{ else }}
-    <main class="max-w-5xl mx-auto dark:bg-slate-900 m-10" {{ if .signedIn }} hx-get="/todos" {{else}} hx-get="/login" {{end}} hx-trigger="load" hx-swap="innerHTML">
+    <main class="max-w-screen-xl mt-20 ml-5 mr-5 xl:m-auto xl:mt-20" {{ if .signedIn }} hx-get="/todos" {{else}} hx-get="/login" {{end}} hx-trigger="load" hx-swap="innerHTML">
 
     </main>
     {{end}}

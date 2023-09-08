@@ -2,39 +2,35 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt"
 	"go-server/utils"
+	"net/http"
 )
 
 func Auth(c *gin.Context) {
 	cookie, err := c.Cookie("token")
 	if err != nil {
-		c.AbortWithStatus(401)
+		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
 	parsedToken, tokenErr := utils.VerifyJwtToken(cookie)
 
 	if tokenErr != nil {
-		c.AbortWithStatus(401)
+		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
 	if !parsedToken.Valid {
-		c.AbortWithStatus(401)
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
-
-	claims, ok := parsedToken.Claims.(jwt.MapClaims)
-	data := claims["data"].(map[string]interface{})
-	id := data["id"].(float64)
-	level := data["username"].(string)
-	if ok && parsedToken.Valid {
-		c.Set("id", id)
-		c.Set("username", level)
+	if claims, ok := parsedToken.Claims.(*utils.TodoClaims); ok && parsedToken.Valid {
+		c.Set("id", claims.Userid)
+		c.Set("username", claims.Username)
 		c.Next()
 	} else {
-		c.AbortWithStatus(401)
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
 	}
 }
 
@@ -43,26 +39,10 @@ func IsUserSignedIn(c *gin.Context) bool {
 	if err != nil {
 		return false
 	}
-
 	parsedToken, tokenErr := utils.VerifyJwtToken(cookie)
 
 	if tokenErr != nil {
 		return false
 	}
-
-	if !parsedToken.Valid {
-		return false
-	}
-
-	claims, ok := parsedToken.Claims.(jwt.MapClaims)
-	data := claims["data"].(map[string]interface{})
-	id := data["id"].(float64)
-	level := data["username"].(string)
-	if ok && parsedToken.Valid {
-		c.Set("id", id)
-		c.Set("username", level)
-		return true
-	} else {
-		return false
-	}
+	return parsedToken.Valid
 }

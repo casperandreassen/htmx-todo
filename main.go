@@ -5,13 +5,11 @@ import (
 	"go-server/db"
 	"go-server/handlers"
 	"go-server/middleware"
-	"go-server/utils"
 	"net/http"
 	"os"
 )
 
 func main() {
-	utils.GenerateKeyPairs()
 	db.InitDB()
 	router := gin.Default()
 

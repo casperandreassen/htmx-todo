@@ -31,7 +31,7 @@ func HandleGetTodoElements(c *gin.Context) {
 }
 
 func HandleNewTodo(c *gin.Context) {
-	userid := c.MustGet("id").(float64)
+	userid := c.MustGet("id").(int)
 	var data db.Todo
 	if err := c.ShouldBind(&data); err != nil {
 		c.String(http.StatusBadRequest, "bad request: %v", err)

@@ -1,28 +1,34 @@
 {{ define "todos" }}
-<div id="todos-list" class="flex flex-col gap-4 ">
+<div id="todos-list" class="flex flex-col gap-4">
 {{if .completedTodos}}
-  <p class="text-gray-900 dark:text-white">Fullførte gjøremål</p>
-  <div class="flex flex-row gap-4 flex-wrap">
+  <div>
+  <p class="text-center lg:text-left text-gray-900 dark:text-white">Fullførte gjøremål</p>
+  <div class="flex flex-row gap-4 flex-wrap justify-center lg:justify-start">
     {{ range .completedTodos }}
       {{ template "todo" . }}
     {{end}}
   </div>
+  </div>
 {{end}}
   {{ if .expiredTodos }}
-  <p class="text-gray-900 dark:text-white">Forfalte gjøremål</p>
-  <div class="flex flex-row gap-4 flex-wrap">
+  <div>
+  <p class="text-center lg:text-left text-gray-900 dark:text-white">Forfalte gjøremål</p>
+  <div class="flex flex-row gap-4 flex-wrap justify-center lg:justify-start">
     {{ range .expiredTodos }}
       {{ template "todo" . }}
     {{end}}
   </div>
+  </div>
   {{end}}
   {{ if .otherTodos }}
-  <p class="text-gray-900 dark:text-white">Andre gjøremål</p>
-  <div class="flex flex-row gap-4 flex-wrap">
+  <div>
+  <p class="text-center lg:text-left text-gray-900 dark:text-white">Andre gjøremål</p>
+  <div class="flex flex-row gap-4 flex-wrap justify-center lg:justify-start">
     {{ range .otherTodos }}
       {{ template "todo" . }}
     {{end}}
     </div>
+  </div>
 {{end}}
 </div>
 {{end}}

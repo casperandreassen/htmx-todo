@@ -1,55 +1,48 @@
 package utils
 
 import (
-	"crypto/rand"
 	"database/sql"
 	"errors"
-	"github.com/golang-jwt/jwt"
-	"golang.org/x/crypto/ed25519"
+	"github.com/golang-jwt/jwt/v5"
+	"os"
 	"time"
 )
 
-var privateKey ed25519.PrivateKey
-var publicKey ed25519.PublicKey
-
-func GenerateKeyPairs() bool {
-	pub, pri, err := ed25519.GenerateKey(rand.Reader)
-
-	if err == nil {
-		privateKey = pri
-		publicKey = pub
-		return true
-	}
-	return false
+type TodoClaims struct {
+	Userid   int    `json:"userid"`
+	Username string `json:"username"`
+	jwt.RegisteredClaims
 }
 
+var jwtSecret = os.Getenv("JWT_SECRET")
+var jwtKey = []byte(jwtSecret)
+
 func IssueJwtToken(id int, username string) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodEdDSA, jwt.MapClaims{
-		"iss": "ruth",
-		"exp": time.Now().Add(time.Hour * 8765).UnixMilli(),
-		"data": map[string]interface{}{
-			"id":       id,
-			"username": username,
+	claims := TodoClaims{
+		id,
+		username,
+		jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(8765 * time.Hour)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			NotBefore: jwt.NewNumericDate(time.Now()),
+			Issuer:    "ruth",
 		},
-	})
-	tokenString, err := token.SignedString(privateKey)
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString(jwtKey)
 	return tokenString, err
 }
 
-func VerifyJwtToken(token string) (*jwt.Token, error) {
-	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
-		ok := token.Method.Alg() == "EdDSA"
-		if ok {
-			return publicKey, nil
-		} else {
-			return "", nil
-		}
+func VerifyJwtToken(tokenString string) (*jwt.Token, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &TodoClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return jwtKey, nil
 	})
+
 	if err != nil {
-		return nil, errors.New("token not valid")
-	} else {
-		return parsedToken, nil
+		return nil, errors.New("Could not parse token.")
 	}
+
+	return token, nil
 }
 
 func NewNullString(s string) sql.NullString {
