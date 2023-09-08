@@ -32,6 +32,7 @@ func RegisterUser(c *gin.Context) {
 
 	if err != nil {
 		c.Status(500)
+		return
 	}
 
 	var stringHash = string(hash)

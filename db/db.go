@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"github.com/joho/godotenv"
 	_ "github.com/libsql/libsql-client-go/libsql"
 	"log"
 	"os"
@@ -17,6 +18,15 @@ type User struct {
 var DB *sql.DB
 
 func InitDB() {
+	env := os.Getenv("APP_ENV")
+
+	if env == "DEV" {
+		err := godotenv.Load("local.env")
+		if err != nil {
+			log.Fatalf("Some error occured. Err: %s", err)
+		}
+	}
+
 	turso_auth_key := os.Getenv("TURSO_AUTH_KEY")
 
 	if turso_auth_key == "" {

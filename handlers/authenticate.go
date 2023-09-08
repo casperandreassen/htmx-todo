@@ -3,12 +3,12 @@ package handlers
 import (
 	"database/sql"
 	"errors"
+	"github.com/gin-gonic/gin"
 	"go-server/db"
 	"go-server/utils"
-	"net/http"
-
-	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
+	"net/http"
+	"os"
 )
 
 type AuthenticateInput struct {
@@ -48,7 +48,8 @@ func Authenticate(c *gin.Context) {
 
 func SignOut(c *gin.Context) {
 	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("token", "", 6000000, "/", "htmx-todo-23.fly.dev", true, true)
+	app_URL := os.Getenv("APP_URL")
+	c.SetCookie("token", "", 31556926, "/", app_URL, true, true)
 	c.Header("HX-Redirect", "/login")
 }
 

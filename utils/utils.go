@@ -27,7 +27,7 @@ func GenerateKeyPairs() bool {
 func IssueJwtToken(user db.User) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodEdDSA, jwt.MapClaims{
 		"iss": "ruth",
-		"exp": time.Now().Add(time.Hour * 6000).UnixMilli(),
+		"exp": time.Now().Add(time.Hour * 8765).UnixMilli(),
 		"data": map[string]interface{}{
 			"id":       user.Id,
 			"username": user.Username,
@@ -61,4 +61,35 @@ func NewNullString(s string) sql.NullString {
 		String: s,
 		Valid:  true,
 	}
+}
+
+func TransformTodos(todos []db.DBTodo) ([]db.DBTodo, []db.DBTodo, []db.DBTodo, error) {
+	completedTodos := []db.DBTodo{}
+	expiredTodos := []db.DBTodo{}
+	otherTodos := []db.DBTodo{}
+	for i := range todos {
+		if !todos[i].Date.Valid {
+			if todos[i].Status == 1 {
+				completedTodos = append(completedTodos, todos[i])
+			} else {
+				otherTodos = append(otherTodos, todos[i])
+			}
+		} else {
+			todoDate, err := time.Parse("2006-01-02", todos[i].Date.String)
+			if err != nil {
+				return nil, nil, nil, errors.New("Could not parse date")
+			}
+			if todos[i].Status == 1 {
+				completedTodos = append(completedTodos, todos[i])
+			} else {
+				if time.Now().After(todoDate) {
+					expiredTodos = append(expiredTodos, todos[i])
+				} else {
+					otherTodos = append(otherTodos, todos[i])
+				}
+			}
+		}
+
+	}
+	return completedTodos, expiredTodos, otherTodos, nil
 }
