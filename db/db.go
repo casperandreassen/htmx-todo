@@ -19,21 +19,21 @@ var DB *sql.DB
 
 func InitDB() {
 	env := os.Getenv("APP_ENV")
-
+	dbUrl := ""
 	if env == "DEV" {
-		err := godotenv.Load("local.env")
+		err := godotenv.Load(".env")
 		if err != nil {
 			log.Fatalf("Some error occured. Err: %s", err)
 		}
+		tursoDbUrl := os.Getenv("TURSO_DB_URL")
+		dbUrl = tursoDbUrl
+	} else {
+		tursoDbUrl := os.Getenv("TURSO_DB_URL")
+		tursoAuthKey := os.Getenv("TURSO_AUTH_KEY")
+		dbUrl = tursoDbUrl + "?authToken=" + tursoAuthKey
 	}
 
-	turso_auth_key := os.Getenv("TURSO_AUTH_KEY")
-
-	if turso_auth_key == "" {
-		log.Fatalf("TURSO AUTH KEY not present.")
-	}
-
-	database, err := sql.Open("libsql", "libsql://pleased-the-leader-casperandreassen.turso.io?authToken="+turso_auth_key)
+	database, err := sql.Open("libsql", dbUrl)
 	if err != nil {
 		log.Fatalln(err)
 	}

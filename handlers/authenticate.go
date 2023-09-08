@@ -34,7 +34,7 @@ func Authenticate(c *gin.Context) {
 		c.HTML(http.StatusOK, "login", gin.H{"errorMessage": "Invalid credentials."})
 		return
 	} else {
-		token, err := utils.IssueJwtToken(user)
+		token, err := utils.IssueJwtToken(user.Id, user.Username)
 		if err == nil {
 			c.SetSameSite(http.SameSiteLaxMode)
 			c.SetCookie("token", token, 6000000, "/", "htmx-todo-23.fly.dev", true, true)

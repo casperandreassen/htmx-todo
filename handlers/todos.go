@@ -3,23 +3,15 @@ package handlers
 import (
 	"github.com/gin-gonic/gin"
 	"go-server/db"
-	"go-server/utils"
 	"net/http"
 )
-
-type Todo struct {
-	Status      int    `db:"status"`
-	Title       string `form:"title" binding:"required" db:"title"`
-	Description string `form:"description" binding:"required" db:"description"`
-	Date        string `form:"date" db:"date"`
-}
 
 func HandleGetTodos(c *gin.Context) {
 	todos, err := db.GetTodos(c)
 	if err != nil {
 		c.AbortWithStatus(500)
 	}
-	completedTodos, expiredTodos, otherTodos, err := utils.TransformTodos(todos)
+	completedTodos, expiredTodos, otherTodos, err := db.TransformTodos(todos)
 	if err != nil {
 		c.AbortWithStatus(500)
 	}
@@ -31,7 +23,7 @@ func HandleGetTodoElements(c *gin.Context) {
 	if err != nil {
 		c.AbortWithStatus(500)
 	}
-	completedTodos, expiredTodos, otherTodos, err := utils.TransformTodos(todos)
+	completedTodos, expiredTodos, otherTodos, err := db.TransformTodos(todos)
 	if err != nil {
 		c.AbortWithStatus(500)
 	}
@@ -40,7 +32,7 @@ func HandleGetTodoElements(c *gin.Context) {
 
 func HandleNewTodo(c *gin.Context) {
 	userid := c.MustGet("id").(float64)
-	var data Todo
+	var data db.Todo
 	if err := c.ShouldBind(&data); err != nil {
 		c.String(http.StatusBadRequest, "bad request: %v", err)
 		return

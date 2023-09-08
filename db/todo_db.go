@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"errors"
 	"github.com/gin-gonic/gin"
-	"go-server/handlers"
 	"go-server/utils"
 	"log"
+	"time"
 )
 
 type DBTodo struct {
@@ -18,7 +18,14 @@ type DBTodo struct {
 	Userid      int            `db:"userid"`
 }
 
-func InsertTodo(todo handlers.Todo, userid int) (int64, error) {
+type Todo struct {
+	Status      int    `db:"status"`
+	Title       string `form:"title" binding:"required" db:"title"`
+	Description string `form:"description" binding:"required" db:"description"`
+	Date        string `form:"date" db:"date"`
+}
+
+func InsertTodo(todo Todo, userid int) (int64, error) {
 	result, err := DB.Exec("INSERT INTO todos (title, description, status, date, userid) VALUES (?, ?, ?, ?, ?)", todo.Title, todo.Description, 0, utils.NewNullString(todo.Date), userid)
 	if err != nil {
 		return 0, errors.New("Could not insert todo")
@@ -86,4 +93,35 @@ func GetTodos(c *gin.Context) ([]DBTodo, error) {
 	}
 
 	return todos, nil
+}
+
+func TransformTodos(todos []DBTodo) ([]DBTodo, []DBTodo, []DBTodo, error) {
+	completedTodos := []DBTodo{}
+	expiredTodos := []DBTodo{}
+	otherTodos := []DBTodo{}
+	for i := range todos {
+		if !todos[i].Date.Valid {
+			if todos[i].Status == 1 {
+				completedTodos = append(completedTodos, todos[i])
+			} else {
+				otherTodos = append(otherTodos, todos[i])
+			}
+		} else {
+			todoDate, err := time.Parse("2006-01-02", todos[i].Date.String)
+			if err != nil {
+				return nil, nil, nil, errors.New("Could not parse date")
+			}
+			if todos[i].Status == 1 {
+				completedTodos = append(completedTodos, todos[i])
+			} else {
+				if time.Now().After(todoDate) {
+					expiredTodos = append(expiredTodos, todos[i])
+				} else {
+					otherTodos = append(otherTodos, todos[i])
+				}
+			}
+		}
+
+	}
+	return completedTodos, expiredTodos, otherTodos, nil
 }
